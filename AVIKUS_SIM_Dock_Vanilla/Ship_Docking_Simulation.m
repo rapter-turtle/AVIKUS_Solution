@@ -12,7 +12,7 @@ addpath(genpath('C:\Users\user\Desktop\casadi-3.6.7-windows64-matlab2018b'))
 dt = 0.01; % Simulation step (fine-grained)
 control_update_dt = 0.5; % Control update interval
 control_update_steps = control_update_dt / dt; % Control update every 10 steps
-T = 100; % Simulation duration
+T = 150; % Simulation duration
 t = 0:dt:T;
 N = length(t);
 
@@ -64,10 +64,14 @@ start_time = 0;
 Num = 50; 
 
 % MPC Weight Parameters
-Q = diag([0 0 0 1000 1000 10000 1e0 1e0 1e-1 1e-1]);
-R = diag([1e1 1e1 5e1 5e1]);
-Rd = diag([1e-1 1e-1 1e-1 1e-1]);
-QN = Num*diag([100 100 10000 1000 1000 1000 1e0 1e0 1e0 1e0]);
+% Q = diag([0 0 0 100 100 10000 1e0 1e0 1e0 1e0]);
+% R = diag([1e1 1e1 1e3 1e3]);
+% Rd = diag([1e1 1e1 1e3 1e3]);
+% QN = Num*diag([1000 1000 1000 10 10 100 1e0 1e0 1e0 1e0]);
+Q = diag([0 0 0 1000 1000 100000 3e0 3e0 1e0 1e0]);
+R = diag([1e1 1e1 1e4 1e4]);
+Rd = diag([1e1 1e1 1e4 1e4]);
+QN = Num*diag([1000 1000 10000 10 10 1000 1e0 1e0 1e0 1e0]);
 
 % init casadi
 c_sol = initialize_casadi(Num, control_update_dt, Q,R,Rd,QN);
@@ -96,7 +100,7 @@ for i = 2:N
         % Dock mode planner
         fprintf('Mode : %d\n', mode);
         if mode == 0
-            if (sqrt((x1 - x_state(i-1))^2 + (x1 - x_state(i-1))^2) < 0.5) && (sqrt((0.5*pi + psi_state(i-1))^2 )< 30*pi/180)
+            if (sqrt((x1 - x_state(i-1))^2 + (x1 - x_state(i-1))^2) < 1.0)
                 dock_count = dock_count + 1;
                 fprintf('Count: %d\n', dock_count);
     
@@ -110,7 +114,7 @@ for i = 2:N
         end
         
         if mode == 1
-            if (sqrt((0.5*pi + psi_state(i-1))^2 )< 30*pi/180)
+            if (sqrt((0.5*pi + psi_state(i-1))^2 )< 10*pi/180)
                 dock_count = dock_count + 1;
                 fprintf('Count: %d\n', dock_count);
                 if (dock_count*control_update_dt >= 3) && (mode == 1)
@@ -124,7 +128,6 @@ for i = 2:N
 
         % Dock mode MPC setting change
         if mode >= 1
-
             n_states = 10;
             c_sol.args.lbx(1:n_states:n_states*(Num+1),1) =  8.5;
             c_sol.args.ubx(1:n_states:n_states*(Num+1),1) =  12.5;
