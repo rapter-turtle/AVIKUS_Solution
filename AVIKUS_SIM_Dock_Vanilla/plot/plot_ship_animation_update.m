@@ -76,7 +76,7 @@ function plot_ship_animation_update(i, ship_patch, path_line, ...
 
 
     %% === Subplot 9개 수동 업데이트 (최근 10초, 개별 ylim 설정) ===
-    time_window = 10;  % seconds
+    time_window = 50;  % seconds
     t_start = t(i) - time_window;
     idx_start = find(t >= t_start, 1, 'first');
 
@@ -84,25 +84,25 @@ function plot_ship_animation_update(i, ship_patch, path_line, ...
     plot(subplot_axes(1), t(idx_start:i), u_state(idx_start:i), 'b'); % 첫 번째 그래프
     title(subplot_axes(1), 'u [m/s]'); ylabel(subplot_axes(1), 'u [m/s]'); xlabel(subplot_axes(1), 'Time [s]');
     %legend(subplot_axes(1), {'u\_state', 'v\_state'}, 'Location', 'best');
-    ylim(subplot_axes(1), 'tight');xlim(subplot_axes(1), [t(i)-10, t(i)]);
+    ylim(subplot_axes(1), 'tight');xlim(subplot_axes(1), [t(i)-time_window, t(i)]);
     grid(subplot_axes(1), 'on');
 
     cla(subplot_axes(2));
     plot(subplot_axes(2), t(idx_start:i), v_state(idx_start:i), 'r');
     title(subplot_axes(2), 'v [m/s]'); ylabel(subplot_axes(2), 'v [m/s]'); xlabel(subplot_axes(2), 'Time [s]');
-    ylim(subplot_axes(2), 'tight');xlim(subplot_axes(2), [t(i)-10, t(i)]);
+    ylim(subplot_axes(2), 'tight');xlim(subplot_axes(2), [t(i)-time_window, t(i)]);
     grid(subplot_axes(2), 'on');
 
     cla(subplot_axes(3));
     plot(subplot_axes(3), t(idx_start:i), r_state(idx_start:i), 'g');
     title(subplot_axes(3), 'r [rad/s]'); ylabel(subplot_axes(3), 'r [rad/s]'); xlabel(subplot_axes(3), 'Time [s]');
-    ylim(subplot_axes(3), 'tight');xlim(subplot_axes(3), [t(i)-10, t(i)]);
+    ylim(subplot_axes(3), 'tight');xlim(subplot_axes(3), [t(i)-time_window, t(i)]);
     grid(subplot_axes(3), 'on');
 
     cla(subplot_axes(4));
     plot(subplot_axes(4), t(idx_start:i), u_state(idx_start:i), 'b');
     title(subplot_axes(4), 'u [m/s]'); ylabel(subplot_axes(4), 'u [m/s]'); xlabel(subplot_axes(4), 'Time [s]');
-    ylim(subplot_axes(4), [-3 3]);xlim(subplot_axes(4), [t(i)-10, t(i)]);
+    ylim(subplot_axes(4), [-3 3]);xlim(subplot_axes(4), [t(i)-time_window, t(i)]);
     grid(subplot_axes(4), 'on');
 
     cla(subplot_axes(5));
@@ -112,7 +112,7 @@ function plot_ship_animation_update(i, ship_patch, path_line, ...
     hold(subplot_axes(5), 'off');
     title(subplot_axes(5), 'Left Thrust Angle'); ylabel(subplot_axes(5), 'delta [rad]'); xlabel(subplot_axes(5), 'Time [s]');
     legend(subplot_axes(5), {'real', 'commend'}, 'Location', 'best');
-    ylim(subplot_axes(5), [-DelMax DelMax]);xlim(subplot_axes(5), [t(i)-10, t(i)]);
+    ylim(subplot_axes(5), [-DelMax DelMax]);xlim(subplot_axes(5), [t(i)-time_window, t(i)]);
     grid(subplot_axes(5), 'on');
 
     cla(subplot_axes(6));
@@ -122,13 +122,13 @@ function plot_ship_animation_update(i, ship_patch, path_line, ...
     hold(subplot_axes(6), 'off');
     title(subplot_axes(6), 'Right Thrust Angle'); ylabel(subplot_axes(6), 'delta [rad]'); xlabel(subplot_axes(6), 'Time [s]');
     legend(subplot_axes(6), {'real', 'commend'}, 'Location', 'best');    
-    ylim(subplot_axes(6), [-DelMax DelMax]);xlim(subplot_axes(6), [t(i)-10, t(i)]);
+    ylim(subplot_axes(6), [-DelMax DelMax]);xlim(subplot_axes(6), [t(i)-time_window, t(i)]);
     grid(subplot_axes(6), 'on');
 
     cla(subplot_axes(7));
     plot(subplot_axes(7), t(idx_start:i), u_state(idx_start:i), 'm');
     title(subplot_axes(7), 'u [m/s]'); ylabel(subplot_axes(7), 'u [m/s]'); xlabel(subplot_axes(7), 'Time [s]');
-    ylim(subplot_axes(7), [-3 3]);xlim(subplot_axes(7), [t(i)-10, t(i)]);
+    ylim(subplot_axes(7), [-3 3]);xlim(subplot_axes(7), [t(i)-time_window, t(i)]);
     grid(subplot_axes(7), 'on');
 
     cla(subplot_axes(8));
@@ -139,7 +139,7 @@ function plot_ship_animation_update(i, ship_patch, path_line, ...
     title(subplot_axes(8), 'Left Thrust CMD'); ylabel(subplot_axes(8), '%'); xlabel(subplot_axes(8), 'Time [s]');
     legend(subplot_axes(8), {'real', 'commend'}, 'Location', 'best');    
     ylim(subplot_axes(8), 'tight');
-    xlim(subplot_axes(8), [t(i)-10, t(i)]);
+    xlim(subplot_axes(8), [t(i)-time_window, t(i)]);
     grid(subplot_axes(8), 'on');
 
     cla(subplot_axes(9));
@@ -150,7 +150,7 @@ function plot_ship_animation_update(i, ship_patch, path_line, ...
     title(subplot_axes(9), 'Right Thrust CMD'); ylabel(subplot_axes(9), '%'); xlabel(subplot_axes(9), 'Time [s]');
     legend(subplot_axes(9), {'real', 'commend'}, 'Location', 'best');    
     ylim(subplot_axes(9), 'tight');
-    xlim(subplot_axes(9), [t(i)-10, t(i)]);
+    xlim(subplot_axes(9), [t(i)-time_window, t(i)]);
     grid(subplot_axes(9), 'on');
 
     drawnow limitrate;

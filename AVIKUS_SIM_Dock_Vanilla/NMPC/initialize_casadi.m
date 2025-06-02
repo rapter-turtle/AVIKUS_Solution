@@ -1,4 +1,4 @@
-function obj = initialize_casadi(Num,dt,Q,R,Rd,QN)
+function obj = initialize_casadi(Num,dt,Q,R,QN)
 import casadi.*
 USV_P = load_parm();
 %% Parameter setting - States
@@ -45,15 +45,6 @@ for k = 1:Num
     %% USV dynamics
     st_next = X(:,k+1);
     objective = objective + con'*R*con;
-    
-    if k < Num
-        con_next = U(:,k+1);
-        objective = objective + (con_next-con)'*Rd*(con_next-con);
-    end
-    % if k == 1
-    %    pre_con = P(n_states+1:n_states+n_controls);
-    %    objective = objective + (pre_con-con)'*Rd*(pre_con-con);
-    % end
 
     xdot = usv_dynamics_mpc(st, con);
     st_next_euler = st + (dt*xdot);

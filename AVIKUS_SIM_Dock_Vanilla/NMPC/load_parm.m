@@ -17,6 +17,7 @@ function P = load_parm()
     P.b = 15.722;
     P.AT = 4;
     P.AL = 10;
+    P.dead_rps = 10;
 
     % % Dynamic model
     % P.Xu    =  -189.76;

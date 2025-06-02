@@ -81,15 +81,17 @@ function [u_next, v_next, r_next, x_next, y_next, psi_next, thrP, thrS, delPR, d
     thrS = minmax(-ThrMax, thrS_new, ThrMax);
 
     % Dead zone
-    rpsP = 10*sign(thrP) + thrP;
-    rpsS = 10*sign(thrS) + thrS;
-    if abs(rpsP)<11
-        rpsP = 0;
-    end
-    if abs(rpsS)<11
-        rpsS = 0;
-    end
+    rpsP = P.dead_rps*sign(thrP) + thrP;
+    rpsS = P.dead_rps*sign(thrS) + thrS;
+    % if abs(rpsP)<11
+    %     rpsP = 0;
+    % end
+    % if abs(rpsS)<11
+    %     rpsS = 0;
+    % end
 
+
+    
     % % RPM2FORCE
     % if rpsP >= 0
     %     TP = uuuF*rpsP*abs(rpsP);

@@ -10,7 +10,7 @@ addpath(genpath('C:\Users\user\Desktop\casadi-3.6.7-windows64-matlab2018b'))
 addpath(genpath('C:\Users\leeck\Desktop\casadi-3.7.0-windows64-matlab2018b'))
 
 %% Simulation parameters
-dt = 0.1; % Simulation step (fine-grained)
+dt = 0.2; % Simulation step (fine-grained)
 control_update_dt = 0.5; % Control update interval
 control_update_steps = control_update_dt / dt; % Control update every 10 steps
 T = 150; % Simulation duration
@@ -69,13 +69,17 @@ Num = 50;
 % R = diag([1e1 1e1 1e3 1e3]);
 % Rd = diag([1e1 1e1 1e3 1e3]);
 % QN = Num*diag([1000 1000 1000 10 10 100 1e0 1e0 1e0 1e0]);
-Q = diag([10 10 10 1000 1000 100000 3e0 3e0 1e0 1e0]);
-R = diag([1e1 1e1 1e4 1e4]);
-Rd = diag([1e1 1e1 1e4 1e4]);
-QN = Num*diag([1000 1000 10000 10 10 1000 1e0 1e0 1e0 1e0]);
+% Q = diag([10 10 10 1000 1000 100000 3e0 3e0 1e0 1e0]);
+% R = diag([1e1 1e1 1e4 1e4]);
+% Rd = diag([1e1 1e1 1e4 1e4]);
+% QN = Num*diag([1000 1000 10000 10 10 1000 1e0 1e0 1e0 1e0]);
+
+Q = diag([1 1 100 10 10 100 1e-6 1e-6 1 1]);
+R = diag([1e-6 1e-6 1 1]);
+QN = Num*diag([1 1 100 10 10 100 1 1 1 1]);
 
 % init casadi
-c_sol = initialize_casadi(Num, control_update_dt, Q,R,Rd,QN);
+c_sol = initialize_casadi(Num, control_update_dt, Q,R,QN);
 c_sol.input.u0 = ones(Num,1).*MPC_input';
 c_sol.input.X0 = repmat(MPC_state',1,Num+1)'; 
 
@@ -98,7 +102,7 @@ end
 for i = 2:N
 
     %% Control policy (MPC)
-    if mod(i, control_update_steps) == 0
+    % if mod(i, control_update_steps) == 0
         MPC_ref = [];
 
         % Dock mode planner
@@ -171,16 +175,19 @@ for i = 2:N
         d_delSR_cmd = usol(1,4);
 
 
-        TP_cmd = xsol(1,7) + d_TP_cmd*control_update_dt;
-        TS_cmd = xsol(1,8) + d_TS_cmd*control_update_dt;
-        delPR_cmd = xsol(1,9) + d_delPR_cmd*control_update_dt;
-        delSR_cmd = xsol(1,10) + d_delSR_cmd*control_update_dt;
+        TP_cmd = xsol(1,7) + d_TP_cmd*dt;
+        TS_cmd = xsol(1,8) + d_TS_cmd*dt;
+        delPR_cmd = xsol(1,9) + d_delPR_cmd*dt;
+        delSR_cmd = xsol(1,10) + d_delSR_cmd*dt;
 
         [alloc_TP_cmd, alloc_TS_cmd] = thrust_allocation(TP_cmd, TS_cmd);
-
+        % alloc_TP_cmd = 1;
+        % alloc_TS_cmd = 1;
+        % delPR_cmd = 0;
+        % delSR_cmd = 0;
         MPC_input = [d_TP_cmd, d_TS_cmd, d_delPR_cmd, d_delSR_cmd]';
 
-    end
+    % end
 
     %% Dynamic updatae
     [u_state(i), v_state(i), r_state(i), x_state(i), y_state(i), psi_state(i), thrP, thrS, delPR, delSR] = update_ship_dynamics(u_state(i-1), v_state(i-1), r_state(i-1), x_state(i-1), y_state(i-1), psi_state(i-1), thrP, thrS, delPR, delSR, alloc_TP_cmd, alloc_TS_cmd, delPR_cmd, delSR_cmd, dt, WX, WY, WN);
@@ -198,7 +205,7 @@ for i = 2:N
     Tau_delPR_real(i) = delPR;
     Tau_delSR_real(i) = delSR;
     % if mod(i,control_update_steps)==0  
-    if mod(i,50)==0  
+    if mod(i,5)==0  
         plot_ship_animation_update(i, ship_patch, path_line, h_thruster_L, h_thruster_R, q_thruster_L, q_thruster_R, pred_path_plot, reference_path_plot, x_state, y_state, psi_state, u_state, v_state, r_state, Tau_TP, Tau_TS, Tau_delPR, Tau_delSR, Tau_TP_real, Tau_TS_real, Tau_delPR_real, Tau_delSR_real, subplot_axes, t, MPC_pred, MPC_ref);
         
         %% Animation MP4
