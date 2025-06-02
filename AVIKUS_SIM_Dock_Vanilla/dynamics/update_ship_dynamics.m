@@ -1,4 +1,4 @@
-function [u_next, v_next, r_next, x_next, y_next, psi_next, thrP, thrS, delPR, delSR, rpsP, rpsS] = update_ship_dynamics(u, v, r, x, y, psi, thrP0, thrS0, delP0, delS0, TP_cmd, TS_cmd, delPR_cmd, delSR_cmd, dt, WX, WY, WN)
+function [u_next, v_next, r_next, x_next, y_next, psi_next, thrP, thrS, delPR, delSR, rpsP, rpsS] = update_ship_dynamics(u, v, r, x, y, psi, thrP0, thrS0, delP0, delS0, TP_cmd, TS_cmd, delPR_cmd, delSR_cmd, dt, WD, WS)
 
     % Actuator Dynamics
     DelRate = 100*3.141592/180; % deg/s
@@ -10,11 +10,9 @@ function [u_next, v_next, r_next, x_next, y_next, psi_next, thrP, thrS, delPR, d
     % Geometric
     L = P.L;
     M = P.M;
-    kzz = P.kzz;
     Izz = P.Izz;
     yp = P.yp;
     xp = P.xp;
-    b = P.b;
     AT = P.AT;
     AL = P.AL;
 
@@ -118,6 +116,35 @@ function [u_next, v_next, r_next, x_next, y_next, psi_next, thrP, thrS, delPR, d
         TS = uuuR*rpsS;
     end
 
+    %% Wind
+
+    WD = deg2rad(WD)+pi;
+    WS = WS*0.5144;
+    AWS = sqrt(WS^2);
+    spd = sqrt(u^2 + v^2);
+    if(WS*cos(WD) == spd*cos(psi))
+        if (WS*sin(WD) > spd*sin(psi))
+            AWD = pi/2;
+        elseif (WS*sin(WD) < spd*sin(psi))
+            AWD = -pi/2;
+        else
+            AWD = 0;
+        end
+    else
+        AWD = atan2((WS*sin(WD) - spd*sin(psi)),(WS*cos(WD)-spd*cos(psi)));
+    end
+    
+    gamma = -AWD -pi + psi;
+    
+    % wind coefficient
+    CX = -P.cx*cos(gamma);
+    CY = P.cy*sin(gamma);
+    CN = P.cn*sin(2*(gamma));
+    
+    % wind force
+    WX = CX*(1/2 * 1.225 * AWS^2 * AT);
+    WY = CY*(1/2 * 1.225 * AWS^2 * AL);
+    WN = CN*(1/2 * 1.225 * AWS^2 * L* AL);
 
     %% Dynamic equation
     %  Hydrodynamic forces

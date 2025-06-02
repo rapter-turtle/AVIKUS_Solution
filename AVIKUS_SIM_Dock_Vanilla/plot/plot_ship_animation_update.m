@@ -76,7 +76,7 @@ function plot_ship_animation_update(i, ship_patch, path_line, ...
 
 
     %% === Subplot 9개 수동 업데이트 (최근 10초, 개별 ylim 설정) ===
-    time_window = 50;  % seconds
+    time_window = 70;  % seconds
     t_start = t(i) - time_window;
     idx_start = find(t >= t_start, 1, 'first');
 

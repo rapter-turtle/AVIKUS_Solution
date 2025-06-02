@@ -3,11 +3,11 @@ import casadi.*
 USV_P = load_parm();
 %% Parameter setting - States
 x = SX.sym('x'); 
-y = SX.sym('u');
+y = SX.sym('y');
+psi = SX.sym('psi');
 u = SX.sym('u');
 v = SX.sym('v');
 r = SX.sym('r');
-psi = SX.sym('psi');
 TP = SX.sym('TP'); 
 TS = SX.sym('TS'); 
 delPR = SX.sym('delPR');
@@ -49,8 +49,21 @@ for k = 1:Num
     xdot = usv_dynamics_mpc(st, con);
     st_next_euler = st + (dt*xdot);
     g = [g;st_next-st_next_euler]; % compute constraints
+    
+    %% Dead zone
+    param_s = 7;
+    param_m = 10;
+    
+    lower_bound = -USV_P.dead_rps * USV_P.KPrvs;
+    upper_bound =  USV_P.dead_rps * USV_P.KPfwd;
+    sig_lo_7 = 1 / (1 + exp(-param_s*(X(7,k) - lower_bound)));
+    sig_hi_7 = 1 / (1 + exp(-param_s*(upper_bound - X(7,k))));
+    sig_lo_8 = 1 / (1 + exp(-param_s*(X(8,k) - lower_bound)));
+    sig_hi_8 = 1 / (1 + exp(-param_s*(upper_bound - X(8,k))));
 
-
+    % objective = objective + param_m * (sig_lo_7 * sig_hi_7);
+    % objective = objective + param_m * (sig_lo_8 * sig_hi_8);
+    
 end
 
 st = X(:,Num+1);  

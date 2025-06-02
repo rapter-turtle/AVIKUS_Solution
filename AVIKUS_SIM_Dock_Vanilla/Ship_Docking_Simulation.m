@@ -5,7 +5,6 @@ addpath(genpath('dynamics'))
 addpath(genpath('plot'))
 addpath(genpath('utils'))
 addpath(genpath('NMPC'))
-addpath(genpath('C:\Users\user\Desktop\qpSWIFT-main'))
 addpath(genpath('C:\Users\user\Desktop\casadi-3.6.7-windows64-matlab2018b'))
 addpath(genpath('C:\Users\leeck\Desktop\casadi-3.7.0-windows64-matlab2018b'))
 
@@ -76,9 +75,9 @@ Num = 50;
 % Rd = diag([1e1 1e1 1e4 1e4]);
 % QN = Num*diag([1000 1000 10000 10 10 1000 1e0 1e0 1e0 1e0]);
 
-Q = diag([1 1 100 10 10 100 1e-6 1e-6 1 1]);
+Q = diag([1 1 10 100 100 1000 1e-6 1e-6 1 1]);
 R = diag([1e-6 1e-6 1 1]);
-QN = Num*diag([1 1 100 10 10 100 1 1 1 1]);
+QN = Num*diag([1 1 10 100 100 1000 1 1 1 1]);
 
 % init casadi
 c_sol = initialize_casadi(Num, control_update_dt, Q,R,QN);
@@ -190,9 +189,11 @@ for i = 2:N
         MPC_input = [d_TP_cmd, d_TS_cmd, d_delPR_cmd, d_delSR_cmd]';
 
     % end
+    WD = 90;
+    WS = 7.5;
 
     %% Dynamic updatae
-    [u_state(i), v_state(i), r_state(i), x_state(i), y_state(i), psi_state(i), thrP, thrS, delPR, delSR, rpsP, rpsS] = update_ship_dynamics(u_state(i-1), v_state(i-1), r_state(i-1), x_state(i-1), y_state(i-1), psi_state(i-1), thrP, thrS, delPR, delSR, alloc_TP_cmd, alloc_TS_cmd, delPR_cmd, delSR_cmd, dt, WX, WY, WN);
+    [u_state(i), v_state(i), r_state(i), x_state(i), y_state(i), psi_state(i), thrP, thrS, delPR, delSR, rpsP, rpsS] = update_ship_dynamics(u_state(i-1), v_state(i-1), r_state(i-1), x_state(i-1), y_state(i-1), psi_state(i-1), thrP, thrS, delPR, delSR, alloc_TP_cmd, alloc_TS_cmd, delPR_cmd, delSR_cmd, dt, WD, WS);
     
     MPC_state = [x_state(i), y_state(i), psi_state(i), u_state(i), v_state(i), r_state(i), TP_cmd, TS_cmd, delPR_cmd, delSR_cmd]';
     
@@ -209,7 +210,7 @@ for i = 2:N
     Tau_delPR_real(i) = delPR;
     Tau_delSR_real(i) = delSR;
     % if mod(i,control_update_steps)==0  
-    if mod(i,5)==0  
+    if mod(i,5)==0 && i > 0
         plot_ship_animation_update(i, ship_patch, path_line, h_thruster_L, h_thruster_R, q_thruster_L, q_thruster_R, pred_path_plot, reference_path_plot, x_state, y_state, psi_state, u_state, v_state, r_state, Tau_TP, Tau_TS, Tau_delPR, Tau_delSR, Tau_TP_real, Tau_TS_real, Tau_delPR_real, Tau_delSR_real, subplot_axes, t, MPC_pred, MPC_ref, rpsP_real, rpsS_real);
         
         %% Animation MP4
