@@ -1,4 +1,4 @@
-function [u_next, v_next, r_next, x_next, y_next, psi_next, thrP, thrS, delPR, delSR] = update_ship_dynamics(u, v, r, x, y, psi, thrP0, thrS0, delP0, delS0, TP_cmd, TS_cmd, delPR_cmd, delSR_cmd, dt, WX, WY, WN)
+function [u_next, v_next, r_next, x_next, y_next, psi_next, thrP, thrS, delPR, delSR, rpsP, rpsS] = update_ship_dynamics(u, v, r, x, y, psi, thrP0, thrS0, delP0, delS0, TP_cmd, TS_cmd, delPR_cmd, delSR_cmd, dt, WX, WY, WN)
 
     % Actuator Dynamics
     DelRate = 100*3.141592/180; % deg/s

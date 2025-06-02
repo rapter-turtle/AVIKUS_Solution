@@ -30,6 +30,8 @@ Tau_delPR = zeros(1, N);
 Tau_delSR = zeros(1, N);
 Tau_TP_real = zeros(1, N);
 Tau_TS_real = zeros(1, N);
+rpsP_real = zeros(1, N);
+rpsS_real = zeros(1, N);
 Tau_delPR_real = zeros(1, N);
 Tau_delSR_real = zeros(1, N);
 
@@ -190,7 +192,7 @@ for i = 2:N
     % end
 
     %% Dynamic updatae
-    [u_state(i), v_state(i), r_state(i), x_state(i), y_state(i), psi_state(i), thrP, thrS, delPR, delSR] = update_ship_dynamics(u_state(i-1), v_state(i-1), r_state(i-1), x_state(i-1), y_state(i-1), psi_state(i-1), thrP, thrS, delPR, delSR, alloc_TP_cmd, alloc_TS_cmd, delPR_cmd, delSR_cmd, dt, WX, WY, WN);
+    [u_state(i), v_state(i), r_state(i), x_state(i), y_state(i), psi_state(i), thrP, thrS, delPR, delSR, rpsP, rpsS] = update_ship_dynamics(u_state(i-1), v_state(i-1), r_state(i-1), x_state(i-1), y_state(i-1), psi_state(i-1), thrP, thrS, delPR, delSR, alloc_TP_cmd, alloc_TS_cmd, delPR_cmd, delSR_cmd, dt, WX, WY, WN);
     
     MPC_state = [x_state(i), y_state(i), psi_state(i), u_state(i), v_state(i), r_state(i), TP_cmd, TS_cmd, delPR_cmd, delSR_cmd]';
     
@@ -202,11 +204,13 @@ for i = 2:N
     Tau_delSR(i) = delSR_cmd;
     Tau_TP_real(i) = thrP;
     Tau_TS_real(i) = thrS;
+    rpsP_real(i) = rpsP;
+    rpsS_real(i) = rpsS;
     Tau_delPR_real(i) = delPR;
     Tau_delSR_real(i) = delSR;
     % if mod(i,control_update_steps)==0  
     if mod(i,5)==0  
-        plot_ship_animation_update(i, ship_patch, path_line, h_thruster_L, h_thruster_R, q_thruster_L, q_thruster_R, pred_path_plot, reference_path_plot, x_state, y_state, psi_state, u_state, v_state, r_state, Tau_TP, Tau_TS, Tau_delPR, Tau_delSR, Tau_TP_real, Tau_TS_real, Tau_delPR_real, Tau_delSR_real, subplot_axes, t, MPC_pred, MPC_ref);
+        plot_ship_animation_update(i, ship_patch, path_line, h_thruster_L, h_thruster_R, q_thruster_L, q_thruster_R, pred_path_plot, reference_path_plot, x_state, y_state, psi_state, u_state, v_state, r_state, Tau_TP, Tau_TS, Tau_delPR, Tau_delSR, Tau_TP_real, Tau_TS_real, Tau_delPR_real, Tau_delSR_real, subplot_axes, t, MPC_pred, MPC_ref, rpsP_real, rpsS_real);
         
         %% Animation MP4
         if save_video

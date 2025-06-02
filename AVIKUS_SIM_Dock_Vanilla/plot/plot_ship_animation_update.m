@@ -3,7 +3,7 @@ function plot_ship_animation_update(i, ship_patch, path_line, ...
     x_state, y_state, psi_state, u_state, v_state, r_state, ...
     Tau_TP, Tau_TS, Tau_delPR, Tau_delSR, ...
     Tau_TP_real, Tau_TS_real, Tau_delPR_real, Tau_delSR_real, ...
-    subplot_axes, t, MPC_pred, MPC_ref)
+    subplot_axes, t, MPC_pred, MPC_ref, rpsP_real, rpsS_real)
 
     L = 9;
     B = 3;
@@ -100,9 +100,9 @@ function plot_ship_animation_update(i, ship_patch, path_line, ...
     grid(subplot_axes(3), 'on');
 
     cla(subplot_axes(4));
-    plot(subplot_axes(4), t(idx_start:i), u_state(idx_start:i), 'b');
-    title(subplot_axes(4), 'u [m/s]'); ylabel(subplot_axes(4), 'u [m/s]'); xlabel(subplot_axes(4), 'Time [s]');
-    ylim(subplot_axes(4), [-3 3]);xlim(subplot_axes(4), [t(i)-time_window, t(i)]);
+    plot(subplot_axes(4), t(idx_start:i), rpsP_real(idx_start:i), 'b');
+    ylabel(subplot_axes(4), 'port [rps]'); xlabel(subplot_axes(4), 'Time [s]');
+    ylim(subplot_axes(4), 'tight');xlim(subplot_axes(4), [t(i)-time_window, t(i)]);
     grid(subplot_axes(4), 'on');
 
     cla(subplot_axes(5));
@@ -126,9 +126,9 @@ function plot_ship_animation_update(i, ship_patch, path_line, ...
     grid(subplot_axes(6), 'on');
 
     cla(subplot_axes(7));
-    plot(subplot_axes(7), t(idx_start:i), u_state(idx_start:i), 'm');
-    title(subplot_axes(7), 'u [m/s]'); ylabel(subplot_axes(7), 'u [m/s]'); xlabel(subplot_axes(7), 'Time [s]');
-    ylim(subplot_axes(7), [-3 3]);xlim(subplot_axes(7), [t(i)-time_window, t(i)]);
+    plot(subplot_axes(7), t(idx_start:i), rpsS_real(idx_start:i), 'm');
+    ylabel(subplot_axes(7), 'stb. [rps]'); xlabel(subplot_axes(7), 'Time [s]');
+    ylim(subplot_axes(7), 'tight');xlim(subplot_axes(7), [t(i)-time_window, t(i)]);
     grid(subplot_axes(7), 'on');
 
     cla(subplot_axes(8));
