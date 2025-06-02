@@ -70,7 +70,7 @@ OPT_variables = [reshape(X,n_states*(Num+1),1);reshape(U,n_controls*Num,1)];
 nlp_prob = struct('f', objective, 'x', OPT_variables, 'g', g, 'p', P);
 
 opts = struct;
-opts.ipopt.max_iter = 20;
+opts.ipopt.max_iter = 25;
 opts.ipopt.print_level = 0; % 0 ~ 3
 opts.print_time = 0;
 opts.ipopt.acceptable_tol = 1e-8;

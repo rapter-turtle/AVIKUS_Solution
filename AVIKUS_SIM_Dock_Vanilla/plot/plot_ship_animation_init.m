@@ -9,7 +9,7 @@ function [ship_patch, path_line, h_thruster_L, h_thruster_R, ...
     arrow_color = 'r';
 
     %% 전체 figure
-    f = figure('Position', [100 100 1600 800]);
+    f = figure('Position', [100 100 1000 500]);
 
     %% 왼쪽: 선박 애니메이션
     left_panel  = uipanel(f, 'Position', [0.00 0.05 0.5 0.9]);
@@ -55,7 +55,7 @@ function [ship_patch, path_line, h_thruster_L, h_thruster_R, ...
     pred_path_plot = plot(mainAx, 1:Num, rand(1,Num), 'g', 'LineWidth', 1.5);  
 
     % Reference
-    reference_path_plot = plot(mainAx, 1:Num, rand(1,Num), 'r', 'LineWidth', 1.5);  
+    reference_path_plot = plot(mainAx, 1:Num, rand(1,Num), 'ro', 'LineWidth', 3.5);  
 
 
 
