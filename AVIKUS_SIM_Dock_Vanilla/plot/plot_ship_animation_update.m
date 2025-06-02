@@ -84,19 +84,19 @@ function plot_ship_animation_update(i, ship_patch, path_line, ...
     plot(subplot_axes(1), t(idx_start:i), u_state(idx_start:i), 'b'); % 첫 번째 그래프
     title(subplot_axes(1), 'u [m/s]'); ylabel(subplot_axes(1), 'u [m/s]'); xlabel(subplot_axes(1), 'Time [s]');
     %legend(subplot_axes(1), {'u\_state', 'v\_state'}, 'Location', 'best');
-    ylim(subplot_axes(1), [-3 3]);xlim(subplot_axes(1), [t(i)-10, t(i)]);
+    ylim(subplot_axes(1), 'tight');xlim(subplot_axes(1), [t(i)-10, t(i)]);
     grid(subplot_axes(1), 'on');
 
     cla(subplot_axes(2));
     plot(subplot_axes(2), t(idx_start:i), v_state(idx_start:i), 'r');
     title(subplot_axes(2), 'v [m/s]'); ylabel(subplot_axes(2), 'v [m/s]'); xlabel(subplot_axes(2), 'Time [s]');
-    ylim(subplot_axes(2), [-3 3]);xlim(subplot_axes(2), [t(i)-10, t(i)]);
+    ylim(subplot_axes(2), 'tight');xlim(subplot_axes(2), [t(i)-10, t(i)]);
     grid(subplot_axes(2), 'on');
 
     cla(subplot_axes(3));
     plot(subplot_axes(3), t(idx_start:i), r_state(idx_start:i), 'g');
     title(subplot_axes(3), 'r [rad/s]'); ylabel(subplot_axes(3), 'r [rad/s]'); xlabel(subplot_axes(3), 'Time [s]');
-    ylim(subplot_axes(3), [-1 1]);xlim(subplot_axes(3), [t(i)-10, t(i)]);
+    ylim(subplot_axes(3), 'tight');xlim(subplot_axes(3), [t(i)-10, t(i)]);
     grid(subplot_axes(3), 'on');
 
     cla(subplot_axes(4));
@@ -136,9 +136,10 @@ function plot_ship_animation_update(i, ship_patch, path_line, ...
     plot(subplot_axes(8), t(idx_start:i), Tau_TP_real(idx_start:i), 'b'); % 첫 번째 그래프
     plot(subplot_axes(8), t(idx_start:i), Tau_TP(idx_start:i), 'r'); % 두 번째 그래프
     hold(subplot_axes(8), 'off');
-    title(subplot_axes(8), 'Left Thrust Force'); ylabel(subplot_axes(8), 'Force [N]'); xlabel(subplot_axes(8), 'Time [s]');
+    title(subplot_axes(8), 'Left Thrust CMD'); ylabel(subplot_axes(8), '%'); xlabel(subplot_axes(8), 'Time [s]');
     legend(subplot_axes(8), {'real', 'commend'}, 'Location', 'best');    
-    ylim(subplot_axes(8), [-50 50]);xlim(subplot_axes(8), [t(i)-10, t(i)]);
+    ylim(subplot_axes(8), 'tight');
+    xlim(subplot_axes(8), [t(i)-10, t(i)]);
     grid(subplot_axes(8), 'on');
 
     cla(subplot_axes(9));
@@ -146,9 +147,10 @@ function plot_ship_animation_update(i, ship_patch, path_line, ...
     plot(subplot_axes(9), t(idx_start:i), Tau_TS_real(idx_start:i), 'b'); % 첫 번째 그래프
     plot(subplot_axes(9), t(idx_start:i), Tau_TS(idx_start:i), 'r'); % 두 번째 그래프
     hold(subplot_axes(9), 'off');
-    title(subplot_axes(9), 'Right Thrust Force'); ylabel(subplot_axes(9), 'Force [N]'); xlabel(subplot_axes(9), 'Time [s]');
+    title(subplot_axes(9), 'Right Thrust CMD'); ylabel(subplot_axes(9), '%'); xlabel(subplot_axes(9), 'Time [s]');
     legend(subplot_axes(9), {'real', 'commend'}, 'Location', 'best');    
-    ylim(subplot_axes(9), [-50 50]);xlim(subplot_axes(9), [t(i)-10, t(i)]);
+    ylim(subplot_axes(9), 'tight');
+    xlim(subplot_axes(9), [t(i)-10, t(i)]);
     grid(subplot_axes(9), 'on');
 
     drawnow limitrate;

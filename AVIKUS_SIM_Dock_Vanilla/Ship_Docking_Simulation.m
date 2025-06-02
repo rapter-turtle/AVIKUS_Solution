@@ -69,7 +69,7 @@ Num = 50;
 % R = diag([1e1 1e1 1e3 1e3]);
 % Rd = diag([1e1 1e1 1e3 1e3]);
 % QN = Num*diag([1000 1000 1000 10 10 100 1e0 1e0 1e0 1e0]);
-Q = diag([0 0 0 1000 1000 100000 3e0 3e0 1e0 1e0]);
+Q = diag([10 10 10 1000 1000 100000 3e0 3e0 1e0 1e0]);
 R = diag([1e1 1e1 1e4 1e4]);
 Rd = diag([1e1 1e1 1e4 1e4]);
 QN = Num*diag([1000 1000 10000 10 10 1000 1e0 1e0 1e0 1e0]);
@@ -189,8 +189,8 @@ for i = 2:N
     
     
     %% Data log
-    Tau_TP(i) = TP_cmd;
-    Tau_TS(i) = TS_cmd;
+    Tau_TP(i) = alloc_TP_cmd;
+    Tau_TS(i) = alloc_TS_cmd;
     Tau_delPR(i) = delPR_cmd;
     Tau_delSR(i) = delSR_cmd;
     Tau_TP_real(i) = thrP;

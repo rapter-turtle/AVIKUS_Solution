@@ -6,72 +6,46 @@ function [u_next, v_next, r_next, x_next, y_next, psi_next, thrP, thrS, delPR, d
     ThrRate = 100; % percent/s
     ThrMax = 100;
 
+    P = load_parm();
     % Geometric
-    L = 9;
-    B = 3;
-    M = 4000; % mass [kg], Maximum mass is 4600
-    kzz = 0.25*L;
-    Izz = kzz^2*M;
-    yp = 0.5;
-    xp = 2;
-    b = 15.722;
-    AT = 4;
-    AL = 10;
-
-    % Dynamic model
-    Xu    =  -189.76;
-    Xvv   =  54.32;
-    Xuvv  =  167.74;
-    Xvvvv =  2076.9;
-    Xrr   =  -15842;
-    Xvr   =  -756.37;
-    Yv    =  -950.31;
-    Yuv   =  818.67;
-    Yvv   =  -3054.3;
-    Yuvv  =  -1589.1;
-    Yr    =  1183.2;
-    Yrr   =  9661.3;
-    Yvvr  =  54001;
-    Yvrr  =  71332;
-    Nv    =  540.22;
-    Nuv   =  -303.61;
-    Nvv   =  1244.9;
-    Nuvv  =  188.83;
-    Nr    =  -6530.9;
-    Nrr   =  23075;
-    Nvvr  =  -36088;
-    Nvrr  =  20781;
-    KPfwd =  1.7;
-    KPrvs =  1.0;
+    L = P.L;
+    M = P.M;
+    kzz = P.kzz;
+    Izz = P.Izz;
+    yp = P.yp;
+    xp = P.xp;
+    b = P.b;
+    AT = P.AT;
+    AL = P.AL;
 
     uuu = zeros(1, 8);
     vvv = zeros(1, 8);
     rrr = zeros(1, 8);
 
-    uuu(1) = Xu;
-    uuu(2) = Xvv;
-    uuu(3) = Xuvv;
-    uuu(4) = Xvvvv;
-    uuu(5) = Xrr;
-    uuu(6) = Xvr;
-    uuu(7) = KPfwd;
-    uuu(8) = KPrvs;
-    vvv(1) = Yv;
-    vvv(2) = Yuv;
-    vvv(3) = Yvv;
-    vvv(4) = Yuvv;
-    vvv(5) = Yr/2;
-    vvv(6) = Yrr/2;
-    vvv(7) = Yvvr/100;
-    vvv(8) = Yvrr/100;
-    rrr(1) = Nv;
-    rrr(2) = Nuv;
-    rrr(3) = Nvv;
-    rrr(4) = Nuvv;
-    rrr(5) = Nr;
-    rrr(6) = Nrr;
-    rrr(7) = Nvvr/100;
-    rrr(8) = Nvrr/100;
+    uuu(1) = P.Xu;
+    uuu(2) = P.Xvv;
+    uuu(3) = P.Xuvv;
+    uuu(4) = P.Xvvvv;
+    uuu(5) = P.Xrr;
+    uuu(6) = P.Xvr;
+    uuu(7) = P.KPfwd;
+    uuu(8) = P.KPrvs;
+    vvv(1) = P.Yv;
+    vvv(2) = P.Yuv;
+    vvv(3) = P.Yvv;
+    vvv(4) = P.Yuvv;
+    vvv(5) = P.Yr;
+    vvv(6) = P.Yrr;
+    vvv(7) = P.Yvvr;
+    vvv(8) = P.Yvrr;
+    rrr(1) = P.Nv;
+    rrr(2) = P.Nuv;
+    rrr(3) = P.Nvv;
+    rrr(4) = P.Nuvv;
+    rrr(5) = P.Nr;
+    rrr(6) = P.Nrr;
+    rrr(7) = P.Nvvr;
+    rrr(8) = P.Nvrr;
 
     uuuF = uuu(7);
     uuuR = uuu(8);
@@ -116,17 +90,30 @@ function [u_next, v_next, r_next, x_next, y_next, psi_next, thrP, thrS, delPR, d
         rpsS = 0;
     end
 
+    % % RPM2FORCE
+    % if rpsP >= 0
+    %     TP = uuuF*rpsP*abs(rpsP);
+    % else
+    %     TP = uuuR*rpsP*abs(rpsP);
+    % end
+    % 
+    % if rpsS >= 0
+    %     TS = uuuF*rpsS*abs(rpsS);
+    % else
+    %     TS = uuuR*rpsS*abs(rpsS);
+    % end
+    % 
     % RPM2FORCE
     if rpsP >= 0
-        TP = uuuF*rpsP*abs(rpsP);
+        TP = uuuF*rpsP;
     else
-        TP = uuuR*rpsP*abs(rpsP);
+        TP = uuuR*rpsP;
     end
-    
+
     if rpsS >= 0
-        TS = uuuF*rpsS*abs(rpsS);
+        TS = uuuF*rpsS;
     else
-        TS = uuuR*rpsS*abs(rpsS);
+        TS = uuuR*rpsS;
     end
 
 
