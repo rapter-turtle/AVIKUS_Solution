@@ -1,5 +1,9 @@
 clc; clear; close all;
 
+
+Mode = 1; % 1 -> MPC input is force, 2 -> MPC input is cmd
+
+
 %% Load Path
 addpath(genpath('dynamics'))
 addpath(genpath('plot'))
@@ -10,9 +14,9 @@ addpath(genpath('C:\Users\leeck\Desktop\casadi-3.7.0-windows64-matlab2018b'))
 
 %% Simulation parameters
 dt = 0.2; % Simulation step (fine-grained)
-control_update_dt = 0.5; % Control update interval
+control_update_dt = 1; % Control update interval
 control_update_steps = control_update_dt / dt; % Control update every 10 steps
-T = 150; % Simulation duration
+T = 100; % Simulation duration
 t = 0:dt:T;
 N = length(t);
 
@@ -75,18 +79,27 @@ Num = 50;
 % Rd = diag([1e1 1e1 1e4 1e4]);
 % QN = Num*diag([1000 1000 10000 10 10 1000 1e0 1e0 1e0 1e0]);
 
-Q = diag([1 1 10 100 100 1000 1e-6 1e-6 1 1]);
-R = diag([1e-6 1e-6 1 1]);
-QN = Num*diag([1 1 10 100 100 1000 1 1 1 1]);
 
 % init casadi
-c_sol = initialize_casadi(Num, control_update_dt, Q,R,QN);
+if Mode == 1
+    Q = diag([2 2 20 200 200 1000 0 0 0 0]);
+    R = diag([1e-5 1e-5 1 1]);
+    QN = Num*diag([5 5 20 200 200 1000 0 0 0 0]);
+    c_sol = initialize_casadi(Num, control_update_dt, Q,R,QN);
+elseif Mode == 2
+    Q = diag([2 2 20 200 200 1000 0 0 0 0]);
+    R = diag([1 1 1 1]);
+    QN = Num*diag([5 5 20 200 200 1000 0 0 0 0]);
+    c_sol = initialize_casadi_cmd(Num, control_update_dt, Q,R,QN);
+    % Q = diag([1 1 50 200 200 1000 0 0 0 0]);
+    % c_sol_2 = initialize_casadi_cmd(Num, control_update_dt, Q,R,QN);
+end
 c_sol.input.u0 = ones(Num,1).*MPC_input';
 c_sol.input.X0 = repmat(MPC_state',1,Num+1)'; 
 
 
 %% Animation initialization
-[ship_patch, path_line, h_thruster_L, h_thruster_R, q_thruster_L, q_thruster_R, pred_path_plot, reference_path_plot, subplot_axes] = plot_ship_animation_init(x_state(1), y_state(1), psi_state(1), Num);
+[ship_patch, path_line, h_thruster_L, h_thruster_R, q_thruster_L, q_thruster_R, pred_path_plot, reference_path_plot, subplot_axes, pred_ship_patch] = plot_ship_animation_init(x_state(1), y_state(1), psi_state(1), Num);
 
 
 %% Animation MP4
@@ -123,7 +136,7 @@ for i = 2:N
         end
         
         if mode == 1
-            if (sqrt((0.5*pi + psi_state(i-1))^2 )< 10*pi/180)
+            if (sqrt((0.5*pi + psi_state(i-1))^2 )< 15*pi/180)
                 dock_count = dock_count + 1;
                 fprintf('Count: %d\n', dock_count);
                 if (dock_count*control_update_dt >= 3) && (mode == 1)
@@ -140,7 +153,7 @@ for i = 2:N
             n_states = 10;
             c_sol.args.lbx(1:n_states:n_states*(Num+1),1) =  8.5;
             c_sol.args.ubx(1:n_states:n_states*(Num+1),1) =  12.5;
-            c_sol.args.lbx(2:n_states:n_states*(Num+1),1) =  0;
+            c_sol.args.lbx(2:n_states:n_states*(Num+1),1) =  -5;
             c_sol.args.ubx(2:n_states:n_states*(Num+1),1) =  15;
         end
 
@@ -180,8 +193,13 @@ for i = 2:N
         TS_cmd = xsol(1,8) + d_TS_cmd*dt;
         delPR_cmd = xsol(1,9) + d_delPR_cmd*dt;
         delSR_cmd = xsol(1,10) + d_delSR_cmd*dt;
-
-        [alloc_TP_cmd, alloc_TS_cmd] = thrust_allocation(TP_cmd, TS_cmd);
+        
+        if Mode == 1
+            [alloc_TP_cmd, alloc_TS_cmd] = thrust_allocation(TP_cmd, TS_cmd);
+        elseif Mode == 2
+            alloc_TP_cmd = TP_cmd;
+            alloc_TS_cmd = TS_cmd;
+        end
         % alloc_TP_cmd = 1;
         % alloc_TS_cmd = 1;
         % delPR_cmd = 0;
@@ -190,7 +208,7 @@ for i = 2:N
 
     % end
     WD = 90;
-    WS = 7.5;
+    WS = 0;
 
     %% Dynamic updatae
     [u_state(i), v_state(i), r_state(i), x_state(i), y_state(i), psi_state(i), thrP, thrS, delPR, delSR, rpsP, rpsS] = update_ship_dynamics(u_state(i-1), v_state(i-1), r_state(i-1), x_state(i-1), y_state(i-1), psi_state(i-1), thrP, thrS, delPR, delSR, alloc_TP_cmd, alloc_TS_cmd, delPR_cmd, delSR_cmd, dt, WD, WS);
@@ -213,6 +231,17 @@ for i = 2:N
     if mod(i,5)==0 && i > 0
         plot_ship_animation_update(i, ship_patch, path_line, h_thruster_L, h_thruster_R, q_thruster_L, q_thruster_R, pred_path_plot, reference_path_plot, x_state, y_state, psi_state, u_state, v_state, r_state, Tau_TP, Tau_TS, Tau_delPR, Tau_delSR, Tau_TP_real, Tau_TS_real, Tau_delPR_real, Tau_delSR_real, subplot_axes, t, MPC_pred, MPC_ref, rpsP_real, rpsS_real);
         
+        for jj = 1:11
+        L = 9; B = 3;
+        shape = [ L/2, 0; L/3, -B/2; -L/2, -B/2; -L/2, B/2; L/3, B/2 ]';
+        ind = 1+5*(jj-1);
+        psi_init = xsol(ind,3);
+        R = [cos(psi_init), -sin(psi_init); sin(psi_init), cos(psi_init)];
+        ship_shape = R * shape + [xsol(ind,1); xsol(ind,2)];
+        set(pred_ship_patch(jj), 'XData', ship_shape(1,:), 'YData', ship_shape(2,:));
+        end
+
+
         %% Animation MP4
         if save_video
         frame = getframe(gcf); % 현재 figure 캡처

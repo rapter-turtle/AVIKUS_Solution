@@ -4,7 +4,7 @@ function [ref_x,ref_y,ref_psi,ref_u,ref_v,ref_r,ref_TP,ref_TS,ref_delPR,ref_delS
     if mode <= 1
         
         % y 위치는 sin 곡선 (x에 비례)
-        ref_y = 1;
+        ref_y = 2;
    
     elseif mode == 2
         % a = 0.05;

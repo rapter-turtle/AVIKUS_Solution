@@ -77,6 +77,12 @@ function [u_next, v_next, r_next, x_next, y_next, psi_next, thrP, thrS, delPR, d
 
     thrP = minmax(-ThrMax, thrP_new, ThrMax);
     thrS = minmax(-ThrMax, thrS_new, ThrMax);
+    if abs(thrP) < 0.001
+        thrP = 0;
+    end
+    if abs(thrS) < 0.001
+        thrS = 0;
+    end
 
     % Dead zone
     rpsP = P.dead_rps*sign(thrP) + thrP;
