@@ -1,7 +1,7 @@
 clc; clear; close all;
 
 
-Mode = 1; % 1 -> MPC input is force, 2 -> MPC input is cmd
+Mode = 2; % 1 -> MPC input is force, 2 -> MPC input is cmd
 
 
 %% Load Path
@@ -10,11 +10,12 @@ addpath(genpath('plot'))
 addpath(genpath('utils'))
 addpath(genpath('NMPC'))
 addpath(genpath('C:\Users\user\Desktop\casadi-3.6.7-windows64-matlab2018b'))
+addpath(genpath('C:\Users\user\Desktop\casadi-3.6.5-windows64-matlab2018b'))
 addpath(genpath('C:\Users\leeck\Desktop\casadi-3.7.0-windows64-matlab2018b'))
 
 %% Simulation parameters
-dt = 0.2; % Simulation step (fine-grained)
-control_update_dt = 1; % Control update interval
+dt = 0.1; % Simulation step (fine-grained)
+control_update_dt = 0.5; % Control update interval
 control_update_steps = control_update_dt / dt; % Control update every 10 steps
 T = 100; % Simulation duration
 t = 0:dt:T;
@@ -67,7 +68,7 @@ start_time = 0;
 
 %% MPC setting
 % Control params
-Num = 50; 
+Num = 40; 
 
 % MPC Weight Parameters
 % Q = diag([0 0 0 100 100 10000 1e0 1e0 1e0 1e0]);
@@ -84,9 +85,12 @@ Num = 50;
 if Mode == 1
     Q = diag([2 2 20 200 200 1000 0 0 0 0]);
     R = diag([1e-5 1e-5 1 1]);
-    QN = Num*diag([5 5 20 200 200 1000 0 0 0 0]);
+    QN = 20*diag([2 2 50 200 200 1000 0 0 0 0]);
     c_sol = initialize_casadi(Num, control_update_dt, Q,R,QN);
 elseif Mode == 2
+    % Q = diag([2 2 20 200 200 1000 0 0 0 0]);
+    % R = diag([1e-3 1e-3 1 1]);
+    % QN = 20*diag([2 2 50 200 200 1000 0 0 0 0]);    
     Q = diag([2 2 20 200 200 1000 0 0 0 0]);
     R = diag([1 1 1 1]);
     QN = Num*diag([5 5 20 200 200 1000 0 0 0 0]);
@@ -103,9 +107,9 @@ c_sol.input.X0 = repmat(MPC_state',1,Num+1)';
 
 
 %% Animation MP4
-save_video = 0;
+save_video = 1;
 if save_video
-video_filename = 'Docking_simulation.mp4'; % 저장할 파일명
+video_filename = 'Docking_simulation_mode2_wind.mp4'; % 저장할 파일명
 v = VideoWriter(video_filename, 'MPEG-4');
 v.FrameRate = 10; % 초당 프레임 수, 적절히 조정 가능
 open(v);
@@ -122,7 +126,7 @@ for i = 2:N
         % Dock mode planner
         fprintf('Mode : %d\n', mode);
         if mode == 0
-            if (sqrt((x1 - x_state(i-1))^2 + (x1 - x_state(i-1))^2) < 1.0)
+            if (sqrt((x1 - x_state(i-1))^2 + (x1 - x_state(i-1))^2) < 1.5)
                 dock_count = dock_count + 1;
                 fprintf('Count: %d\n', dock_count);
     
@@ -172,12 +176,12 @@ for i = 2:N
         reshape(c_sol.input.u0',c_sol.nu*Num,1)];
         
         % Solve the problem
-        % tic
+        tic
         sol = c_sol.solver('x0', c_sol.args.x0, 'lbx', c_sol.args.lbx, 'ubx', c_sol.args.ubx,...
             'lbg', c_sol.args.lbg, 'ubg', c_sol.args.ubg,'p',c_sol.args.p);
         usol = reshape(full(sol.x(c_sol.nx*(Num+1)+1:end))',c_sol.nu,Num)'; % get controls only from the solution
         xsol= reshape(full(sol.x(1:c_sol.nx*(Num+1)))',c_sol.nx,Num+1)'; % get solution TRAJECTORY
-        % toc
+        toc
         c_sol.input.X0 = [xsol(2:end,:);xsol(end,:)];
         c_sol.input.u0 = [usol(2:end,:);usol(end,:)];
         MPC_pred = xsol;
@@ -207,8 +211,8 @@ for i = 2:N
         MPC_input = [d_TP_cmd, d_TS_cmd, d_delPR_cmd, d_delSR_cmd]';
 
     % end
-    WD = 90;
-    WS = 0;
+    WD = 0;
+    WS = 7;
 
     %% Dynamic updatae
     [u_state(i), v_state(i), r_state(i), x_state(i), y_state(i), psi_state(i), thrP, thrS, delPR, delSR, rpsP, rpsS] = update_ship_dynamics(u_state(i-1), v_state(i-1), r_state(i-1), x_state(i-1), y_state(i-1), psi_state(i-1), thrP, thrS, delPR, delSR, alloc_TP_cmd, alloc_TS_cmd, delPR_cmd, delSR_cmd, dt, WD, WS);
@@ -228,13 +232,14 @@ for i = 2:N
     Tau_delPR_real(i) = delPR;
     Tau_delSR_real(i) = delSR;
     % if mod(i,control_update_steps)==0  
-    if mod(i,5)==0 && i > 0
+    if mod(i,10)==0 && i > 0
         plot_ship_animation_update(i, ship_patch, path_line, h_thruster_L, h_thruster_R, q_thruster_L, q_thruster_R, pred_path_plot, reference_path_plot, x_state, y_state, psi_state, u_state, v_state, r_state, Tau_TP, Tau_TS, Tau_delPR, Tau_delSR, Tau_TP_real, Tau_TS_real, Tau_delPR_real, Tau_delSR_real, subplot_axes, t, MPC_pred, MPC_ref, rpsP_real, rpsS_real);
         
         for jj = 1:11
         L = 9; B = 3;
         shape = [ L/2, 0; L/3, -B/2; -L/2, -B/2; -L/2, B/2; L/3, B/2 ]';
-        ind = 1+5*(jj-1);
+        ind = 1+4*(jj-1);
+        % ind = jj;
         psi_init = xsol(ind,3);
         R = [cos(psi_init), -sin(psi_init); sin(psi_init), cos(psi_init)];
         ship_shape = R * shape + [xsol(ind,1); xsol(ind,2)];

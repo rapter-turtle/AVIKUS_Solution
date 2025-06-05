@@ -9,7 +9,7 @@ function [ship_patch, path_line, h_thruster_L, h_thruster_R, ...
     arrow_color = 'r';
 
     %% 전체 figure
-    f = figure('Position', [100 100 1000 500]);
+    f = figure('Position', [100 100 1300 600]);
 
     %% 왼쪽: 선박 애니메이션
     left_panel  = uipanel(f, 'Position', [0.00 0.05 0.5 0.9]);
@@ -26,7 +26,7 @@ function [ship_patch, path_line, h_thruster_L, h_thruster_R, ...
     Dock1_patch = fill(mainAx, Dock1(1,:), Dock1(2,:), Dock_color, 'FaceAlpha', 0.2);
     Dock2 = [ 13, 8; 100, 8; 100, 100; 13, 100]';
     Dock2_patch = fill(mainAx, Dock2(1,:), Dock2(2,:), Dock_color, 'FaceAlpha', 0.2);
-    Dock3 = [ -100, -5; -100, -100; 100, -100; 100, -5]';
+    Dock3 = [ -100, -7; -100, -100; 100, -100; 100, -7]';
     Dock3_patch = fill(mainAx, Dock3(1,:), Dock3(2,:), Dock_color, 'FaceAlpha', 0.2 );
 
     Dock4 = [ 12, 9; 12, 19; 8, 19; 8, 9]';
@@ -40,7 +40,7 @@ function [ship_patch, path_line, h_thruster_L, h_thruster_R, ...
     path_line = animatedline(mainAx, 'LineStyle', '--', 'Color', 'k');
     
     for j = 1:11
-        pred_ship_patch(j) = fill(mainAx, ship_shape(1,:), ship_shape(2,:), 'g', 'FaceAlpha', 0.03,'EdgeAlpha',0.03);
+        pred_ship_patch(j) = fill(mainAx, ship_shape(1,:), ship_shape(2,:), 'g', 'FaceAlpha', 0.02+0.005*j,'EdgeAlpha',0.01*j);
     end
 
     % Thruster 위치 및 도형

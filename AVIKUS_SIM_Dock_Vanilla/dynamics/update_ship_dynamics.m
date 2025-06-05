@@ -77,10 +77,11 @@ function [u_next, v_next, r_next, x_next, y_next, psi_next, thrP, thrS, delPR, d
 
     thrP = minmax(-ThrMax, thrP_new, ThrMax);
     thrS = minmax(-ThrMax, thrS_new, ThrMax);
-    if abs(thrP) < 0.001
+
+    if abs(thrP) < 0.05
         thrP = 0;
     end
-    if abs(thrS) < 0.001
+    if abs(thrS) < 0.05
         thrS = 0;
     end
 
@@ -151,6 +152,8 @@ function [u_next, v_next, r_next, x_next, y_next, psi_next, thrP, thrS, delPR, d
     WX = CX*(1/2 * 1.225 * AWS^2 * AT);
     WY = CY*(1/2 * 1.225 * AWS^2 * AL);
     WN = CN*(1/2 * 1.225 * AWS^2 * L* AL);
+
+    % [WX,WY,WN]
 
     %% Dynamic equation
     %  Hydrodynamic forces
