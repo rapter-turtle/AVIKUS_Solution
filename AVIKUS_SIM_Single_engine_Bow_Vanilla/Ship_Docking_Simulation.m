@@ -58,6 +58,10 @@ dock_count = 0;
 dock_count2 = 0;
 start_time = 0;
 
+time_nlp_1st = 0;
+time_milp = 0;
+time_nlp_2nd = 0;
+
 
 %% MPC setting
 % Control params
@@ -129,11 +133,19 @@ for i = 2:N
         % Get control input
         MPC_input = [usol(1,1), usol(1,2), usol(1,3)]';
         
+        time_nlp_1st = toc;
+
         %% MILP
+        tic;
+        
         dwell_time = 3;
         bow_array = bow_mapping(usol(:,3)/USV_P.bow_thrust,control_update_dt, Num, dwell_time);
 
+        time_milp = toc;
+
         %% 2nd MPC
+        tic;
+        
         MPC_ref = [];
 
         % MPC setting
@@ -175,7 +187,12 @@ for i = 2:N
 
         [alloc_T_cmd] = thrust_allocation(T_cmd);
         MPC_input2 = [d_T_cmd, d_del_cmd]';
-        toc
+        
+        time_nlp_2nd = toc;
+
+        fprintf('nlp_1st : %.2f, milp : %.2f, nlp_2nd : %.2f \n', time_nlp_1st, time_milp, time_nlp_2nd); 
+    
+
     % end
     WD = 0;
     WS = 0;
